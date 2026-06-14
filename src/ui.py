@@ -2,6 +2,7 @@ import PyQt6.QtWidgets as qw
 import PyQt6.QtGui as gui
 from PyQt6.QtCore import Qt
 import os
+from src import calculator
 assets = __file__.replace(r"src\ui.py", "") + "assets"
 class mainWindow(qw.QMainWindow):
     def __init__(self, width, height):
@@ -26,11 +27,17 @@ class mainWindow(qw.QMainWindow):
         # setting up layout and workspace
         self.setStyleSheet("background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fcf7fc, stop:1 #fad2f8);")
         workspace = qw.QWidget()
-        layout = qw.QVBoxLayout(workspace)
+        layout = qw.QHBoxLayout(workspace)
         layout.setContentsMargins(20, 20, 20, 50)
-        # adding stuff to workspace :D
+        editor_layout = qw.QVBoxLayout()
+        editor_widget = qw.QWidget()
+        editor_widget.setLayout(editor_layout)
+        calc_layout = qw.QVBoxLayout()
+        calc_widget = qw.QWidget()
+        calc_widget.setLayout(calc_layout)
         self.menu = self.menuBar()
         self.tabrow = qw.QHBoxLayout()
+        # adding stuff to workspace :D
 
         fileMenu = self.menu.addMenu("File")
         self.actionSave = fileMenu.addAction("Save")
@@ -38,6 +45,7 @@ class mainWindow(qw.QMainWindow):
         self.actionOpen = fileMenu.addAction("Open")
         self.actionOpen.setShortcut("Ctrl+O")
 
+        # ***editor***
         self.newTab = qw.QPushButton()
         self.newTab.setText("+")
         self.newTab.setFixedSize(int(self.size().width() / 100), int(self.size().width() / 100))
@@ -47,11 +55,34 @@ class mainWindow(qw.QMainWindow):
         self.tabrow.addWidget(self.tabs)
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.closeTab)
+        self.tabs.setMovable(True)
 
         self.field = qw.QTextEdit()
+        font = gui.QFont()
+        font.setPointSize(15)
+        self.field.setFont(font)
         self.field.setPlaceholderText("select a file please")
         self.field.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.field.setStyleSheet("background-color: #e2bcf5;")
+
+        # **calculator**
+        self.calcQuery = qw.QLineEdit()
+        calc_layout.addWidget(self.calcQuery)
+        self.calcResponse = qw.QLabel()
+        calc_layout.addWidget(self.calcResponse)
+        self.calcResponse.setText("0")
+        font = gui.QFont()
+        font.setPointSize(24)
+        self.calcResponse.setFont(font)
+        self.calcQuery.textChanged.connect(self.calc)
+
+
+        # **tools**
+        self.toolTabs = qw.QTabWidget()
+        self.toolTabs.setTabPosition(qw.QTabWidget.TabPosition.West)
+        self.toolTabs.addTab(editor_widget, "editor")
+        self.toolTabs.addTab(calc_widget, "calculator")
+        self.toolTabs.setMovable(True)
         # code for functionality
         self.actionSave.triggered.connect(self.save)
         self.actionOpen.triggered.connect(self.openFile)
@@ -59,14 +90,9 @@ class mainWindow(qw.QMainWindow):
         self.tabs.currentChanged.connect(self.changeTab)
         self.field.textChanged.connect(self.textChanged)
         # add all the stuff to layout/workspace
-        waitList = [
-            self.field
-        ]
-
-        layout.addLayout(self.tabrow)
-
-        for i, v in enumerate(waitList):
-            layout.addWidget(v)
+        layout.addWidget(self.toolTabs)
+        editor_layout.addLayout(self.tabrow)
+        editor_layout.addWidget(self.field)
         self.setCentralWidget(workspace)
 
     def resizeEvent(self, event):
@@ -128,8 +154,12 @@ class mainWindow(qw.QMainWindow):
             self.field.setText("")
     def closeTab(self, index):
         file = self.currentFile()
-        self.files.pop(self.files.index(file))
-        self.tabs.removeTab(index)
+        try:
+            self.files.pop(self.files.index(file))
+            self.tabs.removeTab(index)
+        except:
+            print("GHOST FILE?!?!?!")
+            self.tabs.removeTab(index)
     def textChanged(self):
         try:
             index = self.tabs.currentIndex()
@@ -141,5 +171,14 @@ class mainWindow(qw.QMainWindow):
     def currentFile(self):
         for i in self.files:
                 if i["name"] == self.tabs.tabText(self.tabs.currentIndex()).replace("*", ""):
+                    return i
+        print("could not find file!")
+        return None
+    def calc(self):
+        try:
+            res = calculator.calculate(self.calcQuery.text())
+            self.calcResponse.setText(str(res))
+        except IndexError:
+            pass
                     return i
         return None
