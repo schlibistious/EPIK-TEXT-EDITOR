@@ -21,6 +21,8 @@ class mainWindow(qw.QMainWindow):
         print(f"created mainWindow: {width}, {height}, {xcent}, {ycent}")
         # --set up file system!
         self.files = []
+        # --initiate ui
+        self.ui()
         # --check for file params
         if len(params) > 1:
             print("param detected!")
@@ -31,8 +33,6 @@ class mainWindow(qw.QMainWindow):
             self.tabs.setCurrentIndex(self.tabs.count() - 1)
             self.field.setText(file.read())
             file.close()
-
-        self.ui()
     def ui(self):
         # setting up layout and workspace
         self.setStyleSheet("background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fcf7fc, stop:1 #fad2f8);")
