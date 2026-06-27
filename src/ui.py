@@ -3,7 +3,7 @@ import PyQt6.QtGui as gui
 from PyQt6.QtCore import Qt
 import os
 from src import calculator
-assets = os.path.join(os.path.dirname(file), "assets")
+assets = os.path.join(os.path.dirname(__file__), "assets")
 class mainWindow(qw.QMainWindow):
     def __init__(self, width, height, params):
         # make window
