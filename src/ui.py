@@ -5,7 +5,7 @@ import os
 from src import calculator
 assets = __file__.replace(r"src\ui.py", "") + "assets"
 class mainWindow(qw.QMainWindow):
-    def __init__(self, width, height):
+    def __init__(self, width, height, params):
         # make window
         super().__init__()
         screenSize = qw.QApplication.primaryScreen().size()
@@ -19,8 +19,18 @@ class mainWindow(qw.QMainWindow):
         self.move(xcent, ycent)
         self.show()
         print(f"created mainWindow: {width}, {height}, {xcent}, {ycent}")
-        # --set up file system before we leave!
+        # --set up file system!
         self.files = []
+        # --check for file params
+        if len(params) > 1:
+            print("param detected!")
+            name = os.path.basename(params[1])
+            file = open(params[1], "r")
+            self.files.append({"name": name, "dir": params[1], "content": file.read()})
+            self.tabs.addTab(name)
+            self.tabs.setCurrentIndex(self.tabs.count() - 1)
+            self.field.setText(file.read())
+            file.close()
 
         self.ui()
     def ui(self):
@@ -180,5 +190,4 @@ class mainWindow(qw.QMainWindow):
             self.calcResponse.setText(str(res))
         except IndexError:
             pass
-                    return i
         return None

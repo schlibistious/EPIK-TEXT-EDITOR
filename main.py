@@ -5,6 +5,6 @@ app = qt.QApplication(sys.argv)
 screen = app.primaryScreen()
 screenSize = screen.size()
 
-window = ui.mainWindow(int(screenSize.width() / 1.1), int(screenSize.height() / 1.1))
+window = ui.mainWindow(int(screenSize.width() / 1.1), int(screenSize.height() / 1.1), sys.argv)
 
 app.exec()
