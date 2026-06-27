@@ -27,11 +27,12 @@ class mainWindow(qw.QMainWindow):
         if len(params) > 1:
             print("param detected!")
             name = os.path.basename(params[1])
+            content = file.read()
             file = open(params[1], "r")
-            self.files.append({"name": name, "dir": params[1], "content": file.read()})
+            self.files.append({"name": name, "dir": params[1], "content": content})
             self.tabs.addTab(name)
             self.tabs.setCurrentIndex(self.tabs.count() - 1)
-            self.field.setText(file.read())
+            self.field.setText(content)
             file.close()
     def ui(self):
         # setting up layout and workspace
